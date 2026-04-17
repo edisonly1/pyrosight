@@ -4,7 +4,7 @@ WORKDIR /app
 
 # System deps for rasterio/GDAL and scipy
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gdal-bin libgdal-dev gcc g++ && \
+    gdal-bin libgdal-dev gcc g++ curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Python deps
