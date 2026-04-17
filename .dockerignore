@@ -1,0 +1,33 @@
+# Data (too large for Docker image)
+data/
+static_rasters/gridmet/
+static_rasters/gmted2010/
+static_rasters/gmted2010_mn30.zip
+
+# Old checkpoints
+checkpoints_v2/
+checkpoints_v3/
+checkpoints_v3_disabled/
+checkpoints/latest.pt
+checkpoints/epoch_*.pt
+
+# Frontend (deployed separately)
+web/
+frontend/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Misc
+.git/
+.env
+*.log
+training.log
+notebooks/
+sweep.py
+ROADMAP.md
+CLAUDE.md
+.claude/

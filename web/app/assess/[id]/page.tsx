@@ -1,0 +1,148 @@
+import Link from "next/link";
+import type { Assessment } from "@/lib/types";
+import { envNarrative } from "@/lib/utils";
+
+import RiskBanner from "@/components/RiskBanner";
+import ThermalMap from "@/components/ThermalMap";
+import StatCard from "@/components/StatCard";
+import EnvGrid from "@/components/EnvGrid";
+import ChannelStrip from "@/components/ChannelStrip";
+import UncertaintyHist from "@/components/UncertaintyHist";
+import PinButton from "@/components/PinButton";
+
+import UncertaintyStats from "./UncertaintyStats";
+
+async function getAssessment(id: number): Promise<Assessment> {
+  const res = await fetch(`http://localhost:8000/api/samples/${id}/assess`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Assessment failed: ${res.status}`);
+  return res.json();
+}
+
+export default async function AssessDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const sampleId = Number(id);
+  const a = await getAssessment(sampleId);
+
+  const meanFireProb = a.stats.mean_fire_prob;
+  const maxFireProb = a.stats.max_fire_prob;
+  const highRiskPct = a.stats.high_risk_percent;
+
+  return (
+    <main className="max-w-3xl mx-auto px-6 py-16">
+      {/* Header */}
+      <hr className="border-t-4 border-border mb-6" />
+      <p className="font-mono text-[11px] uppercase tracking-widest text-text-3 mb-1">
+        Risk Assessment
+      </p>
+      <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-text mb-8">
+        Region #{sampleId}
+      </h1>
+
+      {/* Risk banner */}
+      <section className="mb-10">
+        <RiskBanner level={a.risk_level} confidence={a.confidence} />
+      </section>
+
+      {/* Thermal map */}
+      <section className="mb-10">
+        <figure>
+          <div className="rounded-xl overflow-hidden border border-border bg-bg-white p-4">
+            <ThermalMap fireProb={a.fire_prob} uncertainty={a.uncertainty} />
+          </div>
+          <figcaption className="text-sm text-text-3 mt-3 font-serif italic leading-relaxed">
+            Predicted next-day fire spread probability. Brighter areas indicate higher likelihood
+            of fire activity. Uncertainty overlay shows where model confidence is lowest.
+          </figcaption>
+        </figure>
+      </section>
+
+      {/* Key statistics */}
+      <section className="grid grid-cols-3 gap-6 mb-12 py-8 border-y border-border">
+        <StatCard
+          value={`${(meanFireProb * 100).toFixed(1)}%`}
+          label="Mean Fire Prob"
+          color="fire"
+        />
+        <StatCard
+          value={`${(maxFireProb * 100).toFixed(1)}%`}
+          label="Peak Fire Prob"
+          color="fire"
+        />
+        <StatCard
+          value={`${(highRiskPct * 100).toFixed(1)}%`}
+          label="High Risk Area"
+          color="amber"
+        />
+      </section>
+
+      {/* Conditions */}
+      <section className="mb-12">
+        <h2 className="font-mono text-[11px] uppercase tracking-widest text-text-3 mb-2">
+          Conditions on the Ground
+        </h2>
+        <p className="font-serif text-lg text-text-2 leading-relaxed mb-6">
+          {envNarrative(a.environment)}
+        </p>
+        <EnvGrid env={a.environment} />
+      </section>
+
+      {/* Uncertainty */}
+      <section className="mb-12 bg-bg-warm rounded-xl border border-border p-6">
+        <h2 className="font-mono text-[11px] uppercase tracking-widest text-text-3 mb-4">
+          Model Uncertainty
+        </h2>
+        <UncertaintyStats uncertainty={a.uncertainty} />
+        <div className="mt-6">
+          <UncertaintyHist data={a.uncertainty} />
+        </div>
+      </section>
+
+      {/* Model inputs */}
+      {a.input_channels && (
+        <section className="mb-12">
+          <h2 className="font-mono text-[11px] uppercase tracking-widest text-text-3 mb-4">
+            Model Inputs
+          </h2>
+          <ChannelStrip channels={a.input_channels} />
+        </section>
+      )}
+
+      {/* Actions */}
+      <section className="flex flex-wrap items-center gap-4 mb-12 py-6 border-y border-border">
+        <PinButton id={sampleId} />
+        <Link
+          href={`/report/${sampleId}`}
+          className="px-5 py-2.5 rounded-lg bg-fire text-white text-sm font-semibold hover:bg-fire-dark transition-colors"
+        >
+          Full Report
+        </Link>
+        <Link
+          href="/map"
+          className="px-5 py-2.5 rounded-lg border border-border text-text-2 text-sm font-medium hover:bg-bg-hover transition-colors"
+        >
+          Back to Map
+        </Link>
+      </section>
+
+      {/* About box */}
+      <section className="bg-bg-warm rounded-xl border border-border p-6 text-sm text-text-2 leading-relaxed">
+        <h3 className="font-mono text-[11px] uppercase tracking-widest text-text-3 mb-2">
+          About this assessment
+        </h3>
+        <p>
+          This assessment was generated by the PyroSight evidential deep-learning model, which
+          fuses satellite imagery, weather data, and Rothermel fire-physics to predict next-day
+          wildfire spread probability. The model produces calibrated uncertainty estimates
+          alongside its predictions, enabling users to gauge where the forecast is most and least
+          reliable. Results should be interpreted alongside local knowledge and current conditions.
+        </p>
+      </section>
+    </main>
+  );
+}

@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+@theme inline {
+  --color-bg: #F8F7F4;
+  --color-bg-white: #FFFFFF;
+  --color-bg-warm: #F3F1EC;
+  --color-bg-hover: #ECEAE4;
+  --color-bg-fire: #FFF7ED;
+  --color-bg-blue: #EFF6FF;
+  --color-bg-green: #F0FDF4;
+  --color-bg-red: #FEF2F2;
+  --color-bg-amber: #FFFBEB;
+
+  --color-border: #E5E2DC;
+  --color-border-l: #D4D0C8;
+
+  --color-text: #1A1917;
+  --color-text-2: #5C5B56;
+  --color-text-3: #8A8882;
+  --color-text-4: #B5B2AB;
+
+  --color-fire: #E8590C;
+  --color-fire-dark: #C2410C;
+  --color-blue: #2563EB;
+  --color-green: #16A34A;
+  --color-red: #DC2626;
+  --color-amber: #D97706;
+
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-plex);
+  --font-serif: var(--font-source-serif);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-l); border-radius: 3px; }
+
+/* Thermal gradient */
+.thermal-gradient {
+  background: linear-gradient(90deg, #1e1b4b, #7c3aed, #db2777, #f97316, #facc15, #fefce8);
+}
+
+/* Canvas pixelated rendering */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Print */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+}

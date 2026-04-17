@@ -1,0 +1,27 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"api,next\" --prefix-colors \"yellow,cyan\" \"cd .. && .venv/bin/uvicorn server:app --port 8000\" \"next dev --turbopack\"",
+    "dev:next": "next dev --turbopack",
+    "build": "next build",
+    "start": "concurrently \"cd .. && .venv/bin/uvicorn server:app --port 8000\" \"next start\""
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1",
+    "framer-motion": "^12.38.0",
+    "maplibre-gl": "^5.23.0",
+    "next": "16.2.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
