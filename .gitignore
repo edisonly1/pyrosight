@@ -11,11 +11,9 @@ venv/
 *.pth
 *.pt
 *.ckpt
-checkpoints/
 wandb/
 *.tfrecord*
 data/
-.ipynb_checkpoints/
 node_modules/
 .next/
 .vercel/
