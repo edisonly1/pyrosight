@@ -25,6 +25,9 @@ COPY static_rasters/dem_conus.tif static_rasters/dem_conus.tif
 COPY static_rasters/ndvi_conus.tif static_rasters/ndvi_conus.tif
 COPY static_rasters/population_conus.tif static_rasters/population_conus.tif
 
+# Test data (TFRecords for nearest-region predictions)
+COPY data/ data/
+
 # GRIDMET cache directory (will be populated on first request)
 RUN mkdir -p static_rasters/gridmet
 

@@ -255,13 +255,21 @@ async def lifespan(app: FastAPI):
     n_params = sum(p.numel() for p in model.parameters())
 
     print("[PyroSight] Parsing test data …")
-    raw_samples = _parse_tfrecord_files(cfg.test_pattern, cfg)
-    dataset = WildfireDataset(raw_samples, cfg, augment=False)
-    print(f"[PyroSight] {len(dataset)} test samples loaded.")
+    try:
+        raw_samples = _parse_tfrecord_files(cfg.test_pattern, cfg)
+        dataset = WildfireDataset(raw_samples, cfg, augment=False)
+        print(f"[PyroSight] {len(dataset)} test samples loaded.")
+    except FileNotFoundError:
+        print("[PyroSight] No test data found — running in live-only mode.")
+        raw_samples = []
+        dataset = None
 
     # Geo-location assignment
-    print("[PyroSight] Assigning geo-locations …")
-    locations = _assign_geo(raw_samples, cfg)
+    if raw_samples:
+        print("[PyroSight] Assigning geo-locations …")
+        locations = _assign_geo(raw_samples, cfg)
+    else:
+        locations = []
 
     # Sample summaries
     summaries = []
