@@ -301,7 +301,7 @@ async def lifespan(app: FastAPI):
     app.state.model_meta = model_meta
     app.state.n_params = n_params
 
-    print(f"[PyroSight] Ready — {len(dataset)} regions on {device}")
+    print(f"[PyroSight] Ready — {len(dataset) if dataset else 0} regions on {device}")
     yield
 
 
