@@ -7,8 +7,6 @@ import numpy as np
 import torch
 from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 
 from pyrosight.config import Config
 from pyrosight.data import _parse_tfrecord_files, WildfireDataset
@@ -305,38 +303,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="PyroSight", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
-# Static files (CSS, JS)
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
-
-
-# ---------------------------------------------------------------------------
-# Page routes
-# ---------------------------------------------------------------------------
-
-@app.get("/")
-async def page_home():
-    return FileResponse("frontend/index.html")
-
-@app.get("/map")
-async def page_map():
-    return FileResponse("frontend/map.html")
-
-@app.get("/assess")
-async def page_assess_default():
-    return FileResponse("frontend/assess.html")
-
-@app.get("/assess/{sample_id}")
-async def page_assess_id(sample_id: int):
-    return FileResponse("frontend/assess.html")
-
-@app.get("/compare")
-async def page_compare():
-    return FileResponse("frontend/compare.html")
-
-@app.get("/report/{sample_id}")
-async def page_report(sample_id: int):
-    return FileResponse("frontend/report.html")
 
 
 # ---------------------------------------------------------------------------
