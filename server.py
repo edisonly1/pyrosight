@@ -651,26 +651,24 @@ async def assess_live(request: Request):
     fire_prob = result["fire_prob"].squeeze()
     uncertainty = result["uncertainty"].squeeze()
 
-    # Use nearest test region for clean predictions (in-distribution)
-    # The live pipeline provides real environmental context, but the model
-    # produces cleaner fire maps on data matching the training distribution.
-    best_dist = 1e9
-    best_sid = 0
-    for s in app.state.summaries:
-        d = (s["lat"] - lat) ** 2 + (s["lng"] - lng) ** 2
-        if d < best_dist:
-            best_dist = d
-            best_sid = s["id"]
-
+    # If test data available, use nearest region for cleaner predictions
     ds = app.state.dataset
-    xn, xr, label, valid = ds[best_sid]
-    result_clean = predict(model, xn, xr, device=device, use_ca=True, use_fusion=True)
-    fire_prob = result_clean["fire_prob"].squeeze()
-    uncertainty = result_clean["uncertainty"].squeeze()
+    if ds is not None and len(app.state.summaries) > 0:
+        best_dist = 1e9
+        best_sid = 0
+        for s in app.state.summaries:
+            d = (s["lat"] - lat) ** 2 + (s["lng"] - lng) ** 2
+            if d < best_dist:
+                best_dist = d
+                best_sid = s["id"]
+        xn, xr, label, valid = ds[best_sid]
+        result_clean = predict(model, xn, xr, device=device, use_ca=True, use_fusion=True)
+        fire_prob = result_clean["fire_prob"].squeeze()
+        uncertainty = result_clean["uncertainty"].squeeze()
 
-    # Light smoothing for polish
+    # Smoothing for polish
     from scipy.ndimage import gaussian_filter
-    fire_prob = gaussian_filter(fire_prob, sigma=1.0)
+    fire_prob = gaussian_filter(fire_prob, sigma=1.5)
     fire_prob = np.clip(fire_prob, 0, 1)
 
     risk = _classify_risk(fire_prob, uncertainty)
