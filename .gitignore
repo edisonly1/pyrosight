@@ -13,7 +13,6 @@ venv/
 *.ckpt
 wandb/
 *.tfrecord*
-data/
 node_modules/
 .next/
 .vercel/
